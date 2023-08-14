@@ -32,6 +32,9 @@
     <ClCompile Include="TimerApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TimerAppLogic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TimerApp.rc">
@@ -49,5 +52,10 @@
   <ItemGroup>
     <Library Include="..\..\..\..\Incoming\SDL2-2.26.5\VisualC\x64\Debug\SDL2.lib" />
     <Library Include="..\..\..\..\Incoming\SDL2-2.26.5\VisualC\x64\Debug\SDL2main.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="data.sql">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
