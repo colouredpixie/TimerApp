@@ -140,6 +140,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TimerApp.cpp" />
+    <ClCompile Include="TimerAppLogic.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TimerApp.rc" />
@@ -151,6 +152,9 @@
   <ItemGroup>
     <Library Include="..\..\..\..\Incoming\SDL2-2.26.5\VisualC\x64\Debug\SDL2.lib" />
     <Library Include="..\..\..\..\Incoming\SDL2-2.26.5\VisualC\x64\Debug\SDL2main.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="data.sql" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
