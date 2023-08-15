@@ -1,55 +1,142 @@
 #include "TimerApp.h"
-#include "SDL.h"
+#include <vector>
+#include <string>
+#include "Item.h"
+#include "App.h"
 
-wxIMPLEMENT_APP(TimerApp);
-
-bool TimerApp::OnInit() {
-    TimerFrame* frame = new TimerFrame();
-    frame->Show(true);
-    return true;
+TimerFrame::TimerFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title)
+{    
+    createControls();
+    BindEventHandlers();
+    addSavedItems(); 
 }
 
-TimerFrame::TimerFrame()
-    : wxFrame(NULL, wxID_ANY, "Hello World")
+void TimerFrame::createControls()
 {
-    wxMenu* menuFile = new wxMenu;
-    menuFile->Append(ID_Hello, "&Hello...\tCtrl-H",
-        "Help string shown in status bar for this menu item");
+    wxFont headlineFont(wxFontInfo(wxSize(0, 24)).Bold());
+    wxFont mainFont(wxFontInfo(wxSize(0, 12)));
+
+    panel = new wxPanel(this);
+    panel->SetFont(mainFont);
+
+    headlineText = new wxStaticText(panel, wxID_ANY, "Your timers", wxPoint(0, 22), wxSize(450, -1), wxALIGN_CENTER_HORIZONTAL);
+    headlineText->SetFont(headlineFont);
+
+    inputField = new wxTextCtrl(panel, wxID_ANY, "", wxPoint(25, 80), wxSize(300, 30), wxTE_PROCESS_ENTER);
+    addButton = new wxButton(panel, wxID_ANY, "Add", wxPoint(325, 80), wxSize(100, 30));
+    checkListBox = new wxCheckListBox(panel, wxID_ANY, wxPoint(25, 120), wxSize(400, 275)); //TODO: add timer, TODO: checklist to sort by time
+    clearButton = new wxButton(panel, wxID_ANY, "Clear", wxPoint(25, 405), wxSize(100, 30));
+    
+    menuFile = new wxMenu;
+    menuFile->Append(wxID_ABOUT);
     menuFile->AppendSeparator();
     menuFile->Append(wxID_EXIT);
-
-    wxMenu* menuHelp = new wxMenu;
-    menuHelp->Append(wxID_ABOUT);
-
     wxMenuBar* menuBar = new wxMenuBar;
     menuBar->Append(menuFile, "&File");
-    menuBar->Append(menuHelp, "&Help");
-
     SetMenuBar(menuBar);
 
     CreateStatusBar();
-    SetStatusText("Welcome to wxWidgets!");
-
-    Bind(wxEVT_MENU, &TimerFrame::OnHello, this, ID_Hello);
-    Bind(wxEVT_MENU, &TimerFrame::OnAbout, this, wxID_ABOUT);
-    Bind(wxEVT_MENU, &TimerFrame::OnExit, this, wxID_EXIT);    //Bind(wxEVT_MENU, [=](wxCommandEvent&) { Close(true); }, wxID_EXIT);
+    SetStatusText("Welcome to the Timer App!");
 }
 
-// event handlers. TODO: channnnge to lambdas?
-void TimerFrame::OnExit(wxCommandEvent& event)
+void TimerFrame::BindEventHandlers()
 {
-    Close(true);
+    addButton->Bind(wxEVT_BUTTON, &TimerFrame::OnAddButtonClicked, this);
+    inputField->Bind(wxEVT_TEXT_ENTER, &TimerFrame::OnInputEnter, this);
+    
+    checkListBox->Bind(wxEVT_KEY_DOWN, &TimerFrame::DeleteSelectedItem, this);
+    
+    clearButton->Bind(wxEVT_BUTTON, &TimerFrame::OnClearButtonClicked, this);
+
+    this->Bind(wxEVT_CLOSE_WINDOW, &TimerFrame::OnWindowClosed, this);
+
+    Bind(wxEVT_MENU, &TimerFrame::OnAbout, this, wxID_ABOUT);
+    this->Bind(wxEVT_MENU, [=](wxCommandEvent&) { Close(true); }, wxID_EXIT); //Using lambda for a simple function binding  
+}
+
+void TimerFrame::addSavedItems()
+{
+    std::vector<Item> items = loadFromFile("data.txt");
+    for (const Item& item : items ) {
+        int index = checkListBox->GetCount();
+        checkListBox->Insert(item.m_description, index);
+        checkListBox->Check(index, item.m_done);
+    }
+
+}
+
+void TimerFrame::OnAddButtonClicked(wxCommandEvent& event)
+{
+    AddTaskFromInput();
+}
+
+void TimerFrame::OnInputEnter(wxCommandEvent& event)
+{
+    AddTaskFromInput();
+}
+
+void TimerFrame::AddTaskFromInput()
+{
+    wxString description = inputField->GetValue();
+    if (!description.IsEmpty()) {
+        checkListBox->Insert(description, checkListBox->GetCount());
+        inputField->Clear();
+    }
+
+    inputField->SetFocus();
+}
+
+void TimerFrame::DeleteSelectedItem(wxKeyEvent& event)
+{
+    int key = event.GetKeyCode();
+    if (key == WXK_DELETE || key == WXK_NUMPAD_DELETE) {
+        int selectedIndex = checkListBox->GetSelection();
+        if (selectedIndex == wxNOT_FOUND) { return; }
+        checkListBox->Delete(selectedIndex);
+    }
+    if (key == WXK_RETURN)
+    {
+       // TODO: check / uncheck checkListBox->GetSelection()->done = true;
+    }
+    if (key == WXK_DOWN || key == WXK_UP)
+    {
+        //TODO: arrow navigation;
+    }
+}
+void TimerFrame::OnClearButtonClicked(wxCommandEvent& event)
+{
+    if (checkListBox->IsEmpty()) { return; }
+
+    wxMessageDialog dialog(this, "Are you sure you want to vlear checked items?", "Clear", wxYES_NO);
+    int result = dialog.ShowModal();
+
+    if (result == wxID_YES) {
+        //TODO: clear only checked items 
+        for (int i = 0; i < checkListBox->GetCount(); i++) {
+
+        }
+        checkListBox->Clear();
+    }
+}
+
+void TimerFrame::OnWindowClosed(wxCloseEvent& event)
+{
+    std::vector<Item> items;
+
+    for (int i = 0; i < checkListBox->GetCount(); i++) {
+        std::string description = static_cast<std::string>(checkListBox->GetString(i));
+        bool done = checkListBox->IsChecked(i);
+        time_t startTime = 0;
+        Item item(description, done, startTime);
+        items.push_back(item);
+    }
+
+    saveToFile(items, "data.txt");
+    event.Skip();
 }
 
 void TimerFrame::OnAbout(wxCommandEvent& event)
 {
-    wxMessageBox("This is a wxWidgets Hello World example",
-        "About Hello World", wxOK | wxICON_INFORMATION);
+    wxMessageBox("This is a simple timer app to note how much time has gone since the addition of an event",
+        "About Timer App", wxOK | wxICON_INFORMATION);
 }
-
-void TimerFrame::OnHello(wxCommandEvent& event)
-{
-    wxLogMessage("Hello world from wxWidgets!");
-}
-
-

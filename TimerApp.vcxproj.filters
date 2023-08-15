@@ -27,12 +27,24 @@
     <ClInclude Include="TimerApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Item.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="App.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TimerApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TimerAppLogic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Item.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="App.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -54,8 +66,13 @@
     <Library Include="..\..\..\..\Incoming\SDL2-2.26.5\VisualC\x64\Debug\SDL2main.lib" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="data.sql">
-      <Filter>Resource Files</Filter>
+    <None Include="README.md">
+      <Filter>Source Files</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="data.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

@@ -3,24 +3,35 @@
 #include "resource.h"
 #include <wx/wx.h>
 
-enum
-{
-    ID_Hello = 1
-};
-
-class TimerApp : public wxApp
-{
-public:
-    virtual bool OnInit();
-};
-
 class TimerFrame : public wxFrame
 {
 public:
-    TimerFrame();
+    TimerFrame(const wxString& title);
 
 private:
-    void OnHello(wxCommandEvent& event);
-    void OnExit(wxCommandEvent& event);
+    wxPanel* panel;
+    wxStaticText* headlineText;
+    wxTextCtrl* inputField;
+    wxButton* addButton;
+    wxCheckListBox* checkListBox;
+    wxButton* clearButton;
+
+    wxMenu* menuFile;
+    wxMenuBar* menuBar;
+
+    void createControls();
+    void BindEventHandlers();
+    void addSavedItems();
+
+    void OnAddButtonClicked(wxCommandEvent& event);
+    void OnInputEnter(wxCommandEvent& event);
+    void AddTaskFromInput();
+
+    void DeleteSelectedItem(wxKeyEvent& event);
+
+    void OnClearButtonClicked(wxCommandEvent& event);
+
+    void OnWindowClosed(wxCloseEvent& event);
+
     void OnAbout(wxCommandEvent& event);
 };
