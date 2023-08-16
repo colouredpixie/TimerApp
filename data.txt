@@ -1,6 +1,4 @@
-5
-aaa 0 0
-vvv 0 0
-ddd 1 0
-iii 0 0
-ooo 1 0
+3
+vgwrG 0 0
+BWERQBHETR 0 0
+n 0 0
