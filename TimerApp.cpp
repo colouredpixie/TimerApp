@@ -13,6 +13,8 @@ TimerFrame::TimerFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title
 
 void TimerFrame::createControls()
 {
+    this->SetWindowStyle(wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER)); // no resize window style
+
     wxFont headlineFont(wxFontInfo(wxSize(0, 24)).Bold());
     wxFont mainFont(wxFontInfo(wxSize(0, 12)));
 
@@ -89,33 +91,41 @@ void TimerFrame::AddTaskFromInput()
 void TimerFrame::DeleteSelectedItem(wxKeyEvent& event)
 {
     int key = event.GetKeyCode();
+    int selectedIndex = checkListBox->GetSelection();
+
     if (key == WXK_DELETE || key == WXK_NUMPAD_DELETE) {
-        int selectedIndex = checkListBox->GetSelection();
         if (selectedIndex == wxNOT_FOUND) { return; }
         checkListBox->Delete(selectedIndex);
     }
-    if (key == WXK_RETURN)
+    if (key == WXK_SPACE)
     {
-       // TODO: check / uncheck checkListBox->GetSelection()->done = true;
+        checkListBox->Check(selectedIndex, !checkListBox->IsChecked(selectedIndex));
     }
-    if (key == WXK_DOWN || key == WXK_UP)
+    if (key == WXK_DOWN)
     {
-        //TODO: arrow navigation;
+        if (checkListBox->GetSelection() < (checkListBox->GetCount() - 1)) // checkListBox->GetCount() returns number of items which is last index + 1
+            checkListBox->SetSelection(selectedIndex + 1);
+    }
+    if (key == WXK_UP)
+    {   
+        if (checkListBox->GetSelection() > 0)
+            checkListBox->SetSelection(selectedIndex - 1);
     }
 }
 void TimerFrame::OnClearButtonClicked(wxCommandEvent& event)
 {
     if (checkListBox->IsEmpty()) { return; }
 
-    wxMessageDialog dialog(this, "Are you sure you want to vlear checked items?", "Clear", wxYES_NO);
+    wxMessageDialog dialog(this, "Are you sure you want to clear checked items?", "Clear", wxYES_NO);
     int result = dialog.ShowModal();
-
+    // get count might return wrong number after clear?
     if (result == wxID_YES) {
-        //TODO: clear only checked items 
         for (int i = 0; i < checkListBox->GetCount(); i++) {
-
+            if (checkListBox->IsChecked(i)) {
+                checkListBox->Delete(i);
+            }
         }
-        checkListBox->Clear();
+        //checkListBox->Clear();
     }
 }
 

@@ -10,7 +10,5 @@ bool App::OnInit()
 	timerFrame->Center();
 	timerFrame->Show();
 
-	//TODO: no resize
-
 	return true;
 }
